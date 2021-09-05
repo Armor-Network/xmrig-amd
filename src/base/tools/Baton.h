@@ -16,41 +16,24 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_ARGUMENTS_H
-#define XMRIG_ARGUMENTS_H
-
-
-#include <vector>
-
-
-#include "base/tools/String.h"
+#ifndef XMRIG_BATON_H
+#define XMRIG_BATON_H
 
 
 namespace xmrig {
 
 
-class Arguments
+template<typename REQ>
+class Baton
 {
 public:
-    Arguments(int argc, char **argv);
+    inline Baton() { req.data = this; }
 
-    bool hasArg(const char *name) const;
-    const char *value(const char *key1, const char *key2 = nullptr) const;
-
-    inline char **argv() const                     { return m_argv; }
-    inline const std::vector<String> &data() const { return m_data; }
-    inline int argc() const                        { return m_argc; }
-
-private:
-    void add(const char *arg);
-
-    char **m_argv;
-    int m_argc;
-    std::vector<String> m_data;
+    REQ req;
 };
 
 
 } /* namespace xmrig */
 
 
-#endif /* XMRIG_ARGUMENTS_H */
+#endif /* XMRIG_BATON_H */

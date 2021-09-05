@@ -1,6 +1,8 @@
 /* XMRig
- * Copyright (c) 2018-2020 SChernykh   <https://github.com/SChernykh>
- * Copyright (c) 2016-2020 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright 2012-2013 The Cryptonote developers
+ * Copyright 2014-2021 The Monero Project
+ * Copyright 2018-2021 SChernykh   <https://github.com/SChernykh>
+ * Copyright 2016-2021 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -16,11 +18,8 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_ARGUMENTS_H
-#define XMRIG_ARGUMENTS_H
-
-
-#include <vector>
+#ifndef XMRIG_WALLETADDRESS_H
+#define XMRIG_WALLETADDRESS_H
 
 
 #include "base/tools/String.h"
@@ -29,28 +28,18 @@
 namespace xmrig {
 
 
-class Arguments
+struct WalletAddress
 {
-public:
-    Arguments(int argc, char **argv);
+    uint64_t tag;
+    uint8_t public_spend_key[32];
+    uint8_t public_view_key[32];
+    uint8_t checksum[4];
 
-    bool hasArg(const char *name) const;
-    const char *value(const char *key1, const char *key2 = nullptr) const;
-
-    inline char **argv() const                     { return m_argv; }
-    inline const std::vector<String> &data() const { return m_data; }
-    inline int argc() const                        { return m_argc; }
-
-private:
-    void add(const char *arg);
-
-    char **m_argv;
-    int m_argc;
-    std::vector<String> m_data;
+    bool Decode(const String& address);
 };
 
 
 } /* namespace xmrig */
 
 
-#endif /* XMRIG_ARGUMENTS_H */
+#endif /* XMRIG_WALLETADDRESS_H */

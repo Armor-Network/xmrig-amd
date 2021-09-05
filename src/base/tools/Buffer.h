@@ -16,41 +16,21 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_ARGUMENTS_H
-#define XMRIG_ARGUMENTS_H
+#ifndef XMRIG_BUFFER_H
+#define XMRIG_BUFFER_H
 
 
+#include <cstdint>
 #include <vector>
-
-
-#include "base/tools/String.h"
 
 
 namespace xmrig {
 
 
-class Arguments
-{
-public:
-    Arguments(int argc, char **argv);
-
-    bool hasArg(const char *name) const;
-    const char *value(const char *key1, const char *key2 = nullptr) const;
-
-    inline char **argv() const                     { return m_argv; }
-    inline const std::vector<String> &data() const { return m_data; }
-    inline int argc() const                        { return m_argc; }
-
-private:
-    void add(const char *arg);
-
-    char **m_argv;
-    int m_argc;
-    std::vector<String> m_data;
-};
+using Buffer = std::vector<uint8_t>;
 
 
 } /* namespace xmrig */
 
 
-#endif /* XMRIG_ARGUMENTS_H */
+#endif /* XMRIG_BUFFER_H */
