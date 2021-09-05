@@ -16,31 +16,42 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_OBJECT_H
-#define XMRIG_OBJECT_H
+#ifndef XMRIG_DNS_H
+#define XMRIG_DNS_H
 
 
-#include <chrono>
+#include "base/net/dns/DnsConfig.h"
+#include "base/tools/String.h"
+
+
+#include <map>
+#include <memory>
 
 
 namespace xmrig {
 
 
-#define XMRIG_DISABLE_COPY_MOVE(X) \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+class DnsConfig;
+class DnsRequest;
+class IDnsBackend;
+class IDnsListener;
 
 
-#define XMRIG_DISABLE_COPY_MOVE_DEFAULT(X) \
-    X()                          = delete; \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+class Dns
+{
+public:
+    inline static const DnsConfig &config()             { return m_config; }
+    inline static void set(const DnsConfig &config)     { m_config = config; }
+
+    static std::shared_ptr<DnsRequest> resolve(const String &host, IDnsListener *listener, uint64_t ttl = 0);
+
+private:
+    static DnsConfig m_config;
+    static std::map<String, std::shared_ptr<IDnsBackend> > m_backends;
+};
 
 
 } /* namespace xmrig */
 
-#endif /* XMRIG_OBJECT_H */
+
+#endif /* XMRIG_DNS_H */

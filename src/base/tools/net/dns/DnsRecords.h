@@ -16,31 +16,33 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_OBJECT_H
-#define XMRIG_OBJECT_H
+#ifndef XMRIG_DNSRECORDS_H
+#define XMRIG_DNSRECORDS_H
 
 
-#include <chrono>
+#include "base/net/dns/DnsRecord.h"
 
 
 namespace xmrig {
 
 
-#define XMRIG_DISABLE_COPY_MOVE(X) \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+class DnsRecords
+{
+public:
+    inline bool isEmpty() const       { return m_ipv4.empty() && m_ipv6.empty(); }
 
+    const DnsRecord &get(DnsRecord::Type prefered = DnsRecord::Unknown) const;
+    size_t count(DnsRecord::Type type = DnsRecord::Unknown) const;
+    void clear();
+    void parse(addrinfo *res);
 
-#define XMRIG_DISABLE_COPY_MOVE_DEFAULT(X) \
-    X()                          = delete; \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+private:
+    std::vector<DnsRecord> m_ipv4;
+    std::vector<DnsRecord> m_ipv6;
+};
 
 
 } /* namespace xmrig */
 
-#endif /* XMRIG_OBJECT_H */
+
+#endif /* XMRIG_DNSRECORDS_H */

@@ -16,31 +16,39 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_OBJECT_H
-#define XMRIG_OBJECT_H
+#ifndef XMRIG_DNSCONFIG_H
+#define XMRIG_DNSCONFIG_H
 
 
-#include <chrono>
+#include "3rdparty/rapidjson/fwd.h"
 
 
 namespace xmrig {
 
 
-#define XMRIG_DISABLE_COPY_MOVE(X) \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+class DnsConfig
+{
+public:
+    static const char *kField;
+    static const char *kIPv6;
+    static const char *kTTL;
+
+    DnsConfig() = default;
+    DnsConfig(const rapidjson::Value &value);
+
+    inline bool isIPv6() const  { return m_ipv6; }
+    inline uint32_t ttl() const { return m_ttl * 1000U; }
+
+    rapidjson::Value toJSON(rapidjson::Document &doc) const;
 
 
-#define XMRIG_DISABLE_COPY_MOVE_DEFAULT(X) \
-    X()                          = delete; \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+private:
+    bool m_ipv6     = false;
+    uint32_t m_ttl  = 30U;
+};
 
 
 } /* namespace xmrig */
 
-#endif /* XMRIG_OBJECT_H */
+
+#endif /* XMRIG_DNSCONFIG_H */

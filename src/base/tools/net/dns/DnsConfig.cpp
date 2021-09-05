@@ -16,31 +16,41 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_OBJECT_H
-#define XMRIG_OBJECT_H
+#include "base/net/dns/DnsConfig.h"
+#include "3rdparty/rapidjson/document.h"
+#include "base/io/json/Json.h"
 
 
-#include <chrono>
+#include <algorithm>
 
 
 namespace xmrig {
 
 
-#define XMRIG_DISABLE_COPY_MOVE(X) \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+const char *DnsConfig::kField   = "dns";
+const char *DnsConfig::kIPv6    = "ipv6";
+const char *DnsConfig::kTTL     = "ttl";
 
 
-#define XMRIG_DISABLE_COPY_MOVE_DEFAULT(X) \
-    X()                          = delete; \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+} // namespace xmrig
 
 
-} /* namespace xmrig */
+xmrig::DnsConfig::DnsConfig(const rapidjson::Value &value)
+{
+    m_ipv6  = Json::getBool(value, kIPv6, m_ipv6);
+    m_ttl   = std::max(Json::getUint(value, kTTL, m_ttl), 1U);
+}
 
-#endif /* XMRIG_OBJECT_H */
+
+rapidjson::Value xmrig::DnsConfig::toJSON(rapidjson::Document &doc) const
+{
+    using namespace rapidjson;
+
+    auto &allocator = doc.GetAllocator();
+    Value obj(kObjectType);
+
+    obj.AddMember(StringRef(kIPv6), m_ipv6, allocator);
+    obj.AddMember(StringRef(kTTL),  m_ttl, allocator);
+
+    return obj;
+}

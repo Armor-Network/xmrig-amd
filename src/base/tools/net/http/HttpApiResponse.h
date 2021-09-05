@@ -1,4 +1,5 @@
 /* XMRig
+ * Copyright (c) 2014-2019 heapwolf    <https://github.com/heapwolf>
  * Copyright (c) 2018-2021 SChernykh   <https://github.com/SChernykh>
  * Copyright (c) 2016-2021 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
@@ -16,31 +17,34 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_OBJECT_H
-#define XMRIG_OBJECT_H
+#ifndef XMRIG_HTTPAPIRESPONSE_H
+#define XMRIG_HTTPAPIRESPONSE_H
 
 
-#include <chrono>
+#include "3rdparty/rapidjson/document.h"
+#include "base/net/http/HttpResponse.h"
 
 
 namespace xmrig {
 
 
-#define XMRIG_DISABLE_COPY_MOVE(X) \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+class HttpApiResponse : public HttpResponse
+{
+public:
+    HttpApiResponse(uint64_t id);
+    HttpApiResponse(uint64_t id, int status);
+
+    inline rapidjson::Document &doc() { return m_doc; }
+
+    void end();
+
+private:
+    rapidjson::Document m_doc;
+};
 
 
-#define XMRIG_DISABLE_COPY_MOVE_DEFAULT(X) \
-    X()                          = delete; \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+} // namespace xmrig
 
 
-} /* namespace xmrig */
+#endif // XMRIG_HTTPAPIRESPONSE_H
 
-#endif /* XMRIG_OBJECT_H */

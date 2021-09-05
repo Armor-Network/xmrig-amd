@@ -1,4 +1,5 @@
 /* XMRig
+ * Copyright (c) 2014-2019 heapwolf    <https://github.com/heapwolf>
  * Copyright (c) 2018-2021 SChernykh   <https://github.com/SChernykh>
  * Copyright (c) 2016-2021 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
@@ -16,31 +17,38 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_OBJECT_H
-#define XMRIG_OBJECT_H
+#ifndef XMRIG_HTTPRESPONSE_H
+#define XMRIG_HTTPRESPONSE_H
 
 
-#include <chrono>
+#include <map>
+#include <string>
 
 
 namespace xmrig {
 
 
-#define XMRIG_DISABLE_COPY_MOVE(X) \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+class HttpResponse
+{
+public:
+    HttpResponse(uint64_t id, int statusCode = 200);
+
+    inline int statusCode() const                                           { return m_statusCode; }
+    inline void setHeader(const std::string &key, const std::string &value) { m_headers.insert({ key, value }); }
+    inline void setStatus(int code)                                         { m_statusCode = code; }
+
+    bool isAlive() const;
+    void end(const char *data = nullptr, size_t size = 0);
+
+private:
+    const uint64_t m_id;
+    int m_statusCode;
+    std::map<const std::string, const std::string> m_headers;
+};
 
 
-#define XMRIG_DISABLE_COPY_MOVE_DEFAULT(X) \
-    X()                          = delete; \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+} // namespace xmrig
 
 
-} /* namespace xmrig */
+#endif // XMRIG_HTTPRESPONSE_H
 
-#endif /* XMRIG_OBJECT_H */

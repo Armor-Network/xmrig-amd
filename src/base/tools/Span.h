@@ -16,31 +16,20 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_OBJECT_H
-#define XMRIG_OBJECT_H
+#ifndef XMRIG_SPAN_H
+#define XMRIG_SPAN_H
 
 
-#include <chrono>
+#include "3rdparty/epee/span.h"
 
 
 namespace xmrig {
 
 
-#define XMRIG_DISABLE_COPY_MOVE(X) \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
-
-
-#define XMRIG_DISABLE_COPY_MOVE_DEFAULT(X) \
-    X()                          = delete; \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+using Span = epee::span<const uint8_t>;
 
 
 } /* namespace xmrig */
 
-#endif /* XMRIG_OBJECT_H */
+
+#endif /* XMRIG_SPAN_H */

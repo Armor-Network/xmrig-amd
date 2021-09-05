@@ -16,31 +16,38 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_OBJECT_H
-#define XMRIG_OBJECT_H
+#ifndef XMRIG_HTTPLISTENER_H
+#define XMRIG_HTTPLISTENER_H
 
 
-#include <chrono>
+#include "base/kernel/interfaces/IHttpListener.h"
 
 
 namespace xmrig {
 
 
-#define XMRIG_DISABLE_COPY_MOVE(X) \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+class HttpListener : public IHttpListener
+{
+public:
+    inline HttpListener(IHttpListener *listener, const char *tag = nullptr) :
+#       ifdef APP_DEBUG
+        m_tag(tag),
+#       endif
+        m_listener(listener)
+    {}
 
+protected:
+    void onHttpData(const HttpData &data) override;
 
-#define XMRIG_DISABLE_COPY_MOVE_DEFAULT(X) \
-    X()                          = delete; \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+private:
+#   ifdef APP_DEBUG
+    const char *m_tag;
+#   endif
+    IHttpListener *m_listener;
+};
 
 
 } /* namespace xmrig */
 
-#endif /* XMRIG_OBJECT_H */
+
+#endif // XMRIG_HTTPLISTENER_H

@@ -1,4 +1,5 @@
 /* XMRig
+ * Copyright (c) 2014-2019 heapwolf    <https://github.com/heapwolf>
  * Copyright (c) 2018-2021 SChernykh   <https://github.com/SChernykh>
  * Copyright (c) 2016-2021 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
@@ -16,31 +17,41 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_OBJECT_H
-#define XMRIG_OBJECT_H
+#ifndef XMRIG_HTTPSERVER_H
+#define XMRIG_HTTPSERVER_H
 
 
-#include <chrono>
+#include "base/kernel/interfaces/ITcpServerListener.h"
+#include "base/tools/Object.h"
+
+
+#include <memory>
 
 
 namespace xmrig {
 
 
-#define XMRIG_DISABLE_COPY_MOVE(X) \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+class IHttpListener;
 
 
-#define XMRIG_DISABLE_COPY_MOVE_DEFAULT(X) \
-    X()                          = delete; \
-    X(const X &other)            = delete; \
-    X(X &&other)                 = delete; \
-    X &operator=(const X &other) = delete; \
-    X &operator=(X &&other)      = delete;
+class HttpServer : public ITcpServerListener
+{
+public:
+    XMRIG_DISABLE_COPY_MOVE_DEFAULT(HttpServer)
+
+    HttpServer(const std::shared_ptr<IHttpListener> &listener);
+    ~HttpServer() override;
+
+protected:
+    void onConnection(uv_stream_t *stream, uint16_t port) override;
+
+private:
+    std::weak_ptr<IHttpListener> m_listener;
+};
 
 
-} /* namespace xmrig */
+} // namespace xmrig
 
-#endif /* XMRIG_OBJECT_H */
+
+#endif // XMRIG_HTTPSERVER_H
+
