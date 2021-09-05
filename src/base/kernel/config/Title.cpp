@@ -16,49 +16,43 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_PROCESS_H
-#define XMRIG_PROCESS_H
+
+#include "base/kernel/config/Title.h"
+#include "3rdparty/rapidjson/document.h"
+#include "base/io/Env.h"
+#include "version.h"
 
 
-#include "base/tools/Arguments.h"
-
-
-#ifdef WIN32
-#   define XMRIG_DIR_SEPARATOR "\\"
-#else
-#   define XMRIG_DIR_SEPARATOR "/"
-#endif
-
-
-namespace xmrig {
-
-
-class Process
+xmrig::Title::Title(const rapidjson::Value &value)
 {
-public:
-    enum Location {
-        ExeLocation,
-        CwdLocation,
-        DataLocation,
-        HomeLocation,
-        TempLocation
-    };
-
-    Process(int argc, char **argv);
-
-    static int pid();
-    static int ppid();
-    static String exepath();
-    static String location(Location location, const char *fileName = nullptr);
-
-    inline const Arguments &arguments() const { return m_arguments; }
-
-private:
-    Arguments m_arguments;
-};
+    if (value.IsBool()) {
+        m_enabled = value.GetBool();
+    }
+    else if (value.IsString()) {
+        m_value = value.GetString();
+    }
+}
 
 
-} /* namespace xmrig */
+rapidjson::Value xmrig::Title::toJSON() const
+{
+    if (isEnabled() && !m_value.isNull()) {
+        return m_value.toJSON();
+    }
+
+    return rapidjson::Value(m_enabled);
+}
 
 
-#endif /* XMRIG_PROCESS_H */
+xmrig::String xmrig::Title::value() const
+{
+    if (!isEnabled()) {
+        return {};
+    }
+
+    if (m_value.isNull()) {
+        return APP_NAME " " APP_VERSION;
+    }
+
+    return Env::expand(m_value);
+}

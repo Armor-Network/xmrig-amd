@@ -16,49 +16,35 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_PROCESS_H
-#define XMRIG_PROCESS_H
+#ifndef XMRIG_TITLE_H
+#define XMRIG_TITLE_H
 
 
-#include "base/tools/Arguments.h"
-
-
-#ifdef WIN32
-#   define XMRIG_DIR_SEPARATOR "\\"
-#else
-#   define XMRIG_DIR_SEPARATOR "/"
-#endif
+#include "3rdparty/rapidjson/fwd.h"
+#include "base/tools/String.h"
 
 
 namespace xmrig {
 
 
-class Process
+class Title
 {
 public:
-    enum Location {
-        ExeLocation,
-        CwdLocation,
-        DataLocation,
-        HomeLocation,
-        TempLocation
-    };
+    Title() = default;
+    Title(const rapidjson::Value &value);
 
-    Process(int argc, char **argv);
+    inline bool isEnabled() const   { return m_enabled; }
 
-    static int pid();
-    static int ppid();
-    static String exepath();
-    static String location(Location location, const char *fileName = nullptr);
-
-    inline const Arguments &arguments() const { return m_arguments; }
+    rapidjson::Value toJSON() const;
+    String value() const;
 
 private:
-    Arguments m_arguments;
+    bool m_enabled  = true;
+    String m_value;
 };
 
 
-} /* namespace xmrig */
+} // namespace xmrig
 
 
-#endif /* XMRIG_PROCESS_H */
+#endif /* XMRIG_TITLE_H */

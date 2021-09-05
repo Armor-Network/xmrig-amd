@@ -16,49 +16,33 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_PROCESS_H
-#define XMRIG_PROCESS_H
+
+#include "base/kernel/Platform.h"
+#include "backend/cpu/platform/HwlocCpuInfo.h"
+#include "backend/cpu/Cpu.h"
 
 
-#include "base/tools/Arguments.h"
+#include <hwloc.h>
+#include <thread>
 
 
-#ifdef WIN32
-#   define XMRIG_DIR_SEPARATOR "\\"
-#else
-#   define XMRIG_DIR_SEPARATOR "/"
-#endif
-
-
-namespace xmrig {
-
-
-class Process
+#ifndef XMRIG_OS_APPLE
+bool xmrig::Platform::setThreadAffinity(uint64_t cpu_id)
 {
-public:
-    enum Location {
-        ExeLocation,
-        CwdLocation,
-        DataLocation,
-        HomeLocation,
-        TempLocation
-    };
+    auto cpu       = static_cast<HwlocCpuInfo *>(Cpu::info());
+    hwloc_obj_t pu = hwloc_get_pu_obj_by_os_index(cpu->topology(), static_cast<unsigned>(cpu_id));
 
-    Process(int argc, char **argv);
+    if (pu == nullptr) {
+        return false;
+    }
 
-    static int pid();
-    static int ppid();
-    static String exepath();
-    static String location(Location location, const char *fileName = nullptr);
+    if (hwloc_set_cpubind(cpu->topology(), pu->cpuset, HWLOC_CPUBIND_THREAD | HWLOC_CPUBIND_STRICT) >= 0) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        return true;
+    }
 
-    inline const Arguments &arguments() const { return m_arguments; }
-
-private:
-    Arguments m_arguments;
-};
-
-
-} /* namespace xmrig */
-
-
-#endif /* XMRIG_PROCESS_H */
+    const bool result = (hwloc_set_cpubind(cpu->topology(), pu->cpuset, HWLOC_CPUBIND_THREAD) >= 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    return result;
+}
+#endif

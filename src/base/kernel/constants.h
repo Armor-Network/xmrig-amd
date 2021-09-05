@@ -16,49 +16,16 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_PROCESS_H
-#define XMRIG_PROCESS_H
+#ifndef XMRIG_CONSTANTS_H
+#define XMRIG_CONSTANTS_H
 
 
-#include "base/tools/Arguments.h"
+#include <cstddef>
+#include <cstdint>
 
 
-#ifdef WIN32
-#   define XMRIG_DIR_SEPARATOR "\\"
-#else
-#   define XMRIG_DIR_SEPARATOR "/"
-#endif
+constexpr size_t      XMRIG_NET_BUFFER_CHUNK_SIZE           = 64 * 1024;
+constexpr size_t      XMRIG_NET_BUFFER_INIT_CHUNKS          = 4;
 
 
-namespace xmrig {
-
-
-class Process
-{
-public:
-    enum Location {
-        ExeLocation,
-        CwdLocation,
-        DataLocation,
-        HomeLocation,
-        TempLocation
-    };
-
-    Process(int argc, char **argv);
-
-    static int pid();
-    static int ppid();
-    static String exepath();
-    static String location(Location location, const char *fileName = nullptr);
-
-    inline const Arguments &arguments() const { return m_arguments; }
-
-private:
-    Arguments m_arguments;
-};
-
-
-} /* namespace xmrig */
-
-
-#endif /* XMRIG_PROCESS_H */
+#endif /* XMRIG_CONSTANTS_H */
