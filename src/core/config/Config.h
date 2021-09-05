@@ -1,11 +1,6 @@
 /* XMRig
- * Copyright 2010      Jeff Garzik <jgarzik@pobox.com>
- * Copyright 2012-2014 pooler      <pooler@litecoinpool.org>
- * Copyright 2014      Lucas Jones <https://github.com/lucasjones>
- * Copyright 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
- * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
- * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
- * Copyright 2016-2018 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright (c) 2018-2021 SChernykh   <https://github.com/SChernykh>
+ * Copyright (c) 2016-2021 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -25,70 +20,92 @@
 #define XMRIG_CONFIG_H
 
 
-#include <stdint.h>
-#include <vector>
+#include <cstdint>
 
 
-#include "amd/OclCLI.h"
-#include "common/config/CommonConfig.h"
-#include "common/xmrig.h"
-#include "rapidjson/fwd.h"
+#include "3rdparty/rapidjson/fwd.h"
+#include "backend/cpu/CpuConfig.h"
+#include "base/kernel/config/BaseConfig.h"
+#include "base/tools/Object.h"
 
 
 namespace xmrig {
 
 
-class ConfigLoader;
+class ConfigPrivate;
+class CudaConfig;
 class IThread;
-class IConfigListener;
-class Process;
+class OclConfig;
+class RxConfig;
 
 
-class Config : public CommonConfig
+class Config : public BaseConfig
 {
 public:
+    XMRIG_DISABLE_COPY_MOVE(Config);
+
+    static const char *kPauseOnBattery;
+    static const char *kPauseOnActive;
+
+#   ifdef XMRIG_FEATURE_OPENCL
+    static const char *kOcl;
+#   endif
+
+#   ifdef XMRIG_FEATURE_CUDA
+    static const char *kCuda;
+#   endif
+
+#   if defined(XMRIG_FEATURE_NVML) || defined (XMRIG_FEATURE_ADL)
+    static const char *kHealthPrintTime;
+#   endif
+
+#   ifdef XMRIG_FEATURE_DMI
+    static const char *kDMI;
+#   endif
+
     Config();
+    ~Config() override;
 
-    bool isCNv2() const;
-    bool oclInit();
-    bool reload(const char *json);
+    inline bool isPauseOnActive() const { return idleTime() > 0; }
 
+    bool isPauseOnBattery() const;
+    const CpuConfig &cpu() const;
+    uint32_t idleTime() const;
+
+#   ifdef XMRIG_FEATURE_OPENCL
+    const OclConfig &cl() const;
+#   endif
+
+#   ifdef XMRIG_FEATURE_CUDA
+    const CudaConfig &cuda() const;
+#   endif
+
+#   ifdef XMRIG_ALGO_RANDOMX
+    const RxConfig &rx() const;
+#   endif
+
+#   if defined(XMRIG_FEATURE_NVML) || defined (XMRIG_FEATURE_ADL)
+    uint32_t healthPrintTime() const;
+#   else
+    uint32_t healthPrintTime() const        { return 0; }
+#   endif
+
+#   ifdef XMRIG_FEATURE_DMI
+    bool isDMI() const;
+#   else
+    static constexpr inline bool isDMI()    { return false; }
+#   endif
+
+    bool isShouldSave() const;
+    bool read(const IJsonReader &reader, const char *fileName) override;
     void getJSON(rapidjson::Document &doc) const override;
 
-    inline bool isOclCache() const                       { return m_cache; }
-    inline bool isShouldSave() const                     { return m_shouldSave && isAutoSave(); }
-    inline const char *loader() const                    { return m_loader.data(); }
-    inline const std::vector<IThread *> &threads() const { return m_threads; }
-    inline int platformIndex() const                     { return m_platformIndex; }
-    inline xmrig::OclVendor vendor() const               { return m_vendor; }
-
-    static Config *load(Process *process, IConfigListener *listener);
-    static const char *vendorName(xmrig::OclVendor vendor);
-
-protected:
-    bool finalize() override;
-    bool parseBoolean(int key, bool enable) override;
-    bool parseString(int key, const char *arg) override;
-    bool parseUint64(int key, uint64_t arg) override;
-    void parseJSON(const rapidjson::Document &doc) override;
-
 private:
-    std::vector<IThread *> filterThreads() const;
-    void parseThread(const rapidjson::Value &object);
-    void setPlatformIndex(const char *name);
-    void setPlatformIndex(int index);
-
-    bool m_autoConf;
-    bool m_cache;
-    bool m_shouldSave;
-    int m_platformIndex;
-    OclCLI m_oclCLI;
-    std::vector<IThread *> m_threads;
-    xmrig::String m_loader;
-    xmrig::OclVendor m_vendor;
+    ConfigPrivate *d_ptr;
 };
 
 
 } /* namespace xmrig */
+
 
 #endif /* XMRIG_CONFIG_H */

@@ -16,52 +16,22 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_CONTROLLER_H
-#define XMRIG_CONTROLLER_H
+#include "App.h"
+#include "base/kernel/Entry.h"
+#include "base/kernel/Process.h"
 
 
-#include "base/kernel/Base.h"
-
-
-#include <memory>
-
-
-namespace xmrig {
-
-
-class HwApi;
-class Job;
-class Miner;
-class Network;
-
-
-class Controller : public Base
+int main(int argc, char **argv)
 {
-public:
-    XMRIG_DISABLE_COPY_MOVE_DEFAULT(Controller)
+    using namespace xmrig;
 
-    Controller(Process *process);
-    ~Controller() override;
+    Process process(argc, argv);
+    const Entry::Id entry = Entry::get(process);
+    if (entry) {
+        return Entry::exec(process, entry);
+    }
 
-    int init() override;
-    void start() override;
-    void stop() override;
+    App app(&process);
 
-    Miner *miner() const;
-    Network *network() const;
-    void execCommand(char command) const;
-
-private:
-    std::shared_ptr<Miner> m_miner;
-    std::shared_ptr<Network> m_network;
-
-#   ifdef XMRIG_FEATURE_API
-    std::shared_ptr<HwApi> m_hwApi;
-#   endif
-};
-
-
-} // namespace xmrig
-
-
-#endif /* XMRIG_CONTROLLER_H */
+    return app.exec();
+}
