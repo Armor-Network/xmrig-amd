@@ -1,30 +1,20 @@
---- a/CMakeLists.txt
+
 +++ b/CMakeLists.txt
 @@ -1,24 +1,23 @@
--cmake_minimum_required(VERSION 2.4.4)
--set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
+
 +cmake_minimum_required(VERSION 2.8.12)
 +cmake_policy(SET CMP0048 NEW)
 +project(zlib VERSION 1.2.11.1 LANGUAGES C)
  
--project(zlib C)
+
 +option(ASM686 "Enable building i686 assembly implementation" OFF)
 +option(AMD64 "Enable building amd64 assembly implementation" OFF)
  
--set(VERSION "1.2.11")
+
 +include(GNUInstallDirs)
 +set(INSTALL_BIN_DIR "${CMAKE_INSTALL_BINDIR}" CACHE PATH "Installation directory for executables")
 +set(INSTALL_LIB_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE PATH "Installation directory for libraries")
 +set(INSTALL_INC_DIR "${CMAKE_INSTALL_INCLUDEDIR}" CACHE PATH "Installation directory for headers")
- 
--option(ASM686 "Enable building i686 assembly implementation")
--option(AMD64 "Enable building amd64 assembly implementation")
--
--set(INSTALL_BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin" CACHE PATH "Installation directory for executables")
--set(INSTALL_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib" CACHE PATH "Installation directory for libraries")
--set(INSTALL_INC_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "Installation directory for headers")
--set(INSTALL_MAN_DIR "${CMAKE_INSTALL_PREFIX}/share/man" CACHE PATH "Installation directory for manual pages")
--set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_PREFIX}/share/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
 +set(INSTALL_MAN_DIR "${CMAKE_INSTALL_MANDIR}" CACHE PATH "Installation directory for manual pages")
 +set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_DATADIR}/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
  
@@ -32,7 +22,7 @@
  include(CheckFunctionExists)
  include(CheckIncludeFile)
  include(CheckCSourceCompiles)
--enable_testing()
+
 +include(CTest)
  
  check_include_file(sys/types.h HAVE_SYS_TYPES_H)
@@ -41,7 +31,7 @@
      set(CMAKE_DEBUG_POSTFIX "d")
      add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
      add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
--    include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
  endif()
  
  if(NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)
@@ -49,18 +39,18 @@
  		${ZLIB_PC} @ONLY)
  configure_file(	${CMAKE_CURRENT_SOURCE_DIR}/zconf.h.cmakein
  		${CMAKE_CURRENT_BINARY_DIR}/zconf.h @ONLY)
--include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR})
+
  
  
  #============================================================================
-@@ -132,9 +129,9 @@ endif()
+@@ 
  if(CMAKE_COMPILER_IS_GNUCC)
      if(ASM686)
          set(ZLIB_ASMS contrib/asm686/match.S)
--    elseif (AMD64)
+
 +			elseif(AMD64)
          set(ZLIB_ASMS contrib/amd64/amd64-match.S)
--    endif ()
+
 +    endif()
  
  	if(ZLIB_ASMS)
@@ -69,25 +59,22 @@
  endif()
  
  if(MSVC)
--    if(ASM686)
+
 +	if(ASM686)
  		ENABLE_LANGUAGE(ASM_MASM)
--        set(ZLIB_ASMS
+
 +		set(ZLIB_ASMS
  			contrib/masmx86/inffas32.asm
  			contrib/masmx86/match686.asm
--		)
--    elseif (AMD64)
+
 +			)
 +	elseif(AMD64)
  		ENABLE_LANGUAGE(ASM_MASM)
--        set(ZLIB_ASMS
+
 +		set(ZLIB_ASMS
  			contrib/masmx64/gvmat64.asm
  			contrib/masmx64/inffasx64.asm
--		)
--    endif()
--
+
 +			)
 +		# set(ZLIB_SRCS ${ZLIB_SRCS} contrib/masmx64/inffas8664.c)
 +	endif()
@@ -107,8 +94,7 @@
 +	SOVERSION 1)
 +
  add_library(zlibstatic STATIC ${ZLIB_SRCS} ${ZLIB_ASMS} ${ZLIB_PUBLIC_HDRS} ${ZLIB_PRIVATE_HDRS})
--set_target_properties(zlib PROPERTIES DEFINE_SYMBOL ZLIB_DLL)
--set_target_properties(zlib PROPERTIES SOVERSION 1)
+
 +target_include_directories(zlibstatic PUBLIC
 +	$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 +	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -134,7 +120,7 @@
      set_target_properties(zlib PROPERTIES SUFFIX "1.dll")
  endif()
  
--if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
+
 +#if(WIN32)
 +#	add_definitions(-DZLIB_WINAPI)
 +#endif()
@@ -144,7 +130,7 @@
 -        RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
 -        ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
 -        LIBRARY DESTINATION "${INSTALL_LIB_DIR}" )
--endif()
+
 +			EXPORT ZLIBTargets
 +			RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
 +			ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
@@ -170,23 +156,7 @@
  #============================================================================
  # Example binaries
  #============================================================================
--
--add_executable(example test/example.c)
--target_link_libraries(example zlib)
--add_test(example example)
--
--add_executable(minigzip test/minigzip.c)
--target_link_libraries(minigzip zlib)
--
--if(HAVE_OFF64_T)
--    add_executable(example64 test/example.c)
--    target_link_libraries(example64 zlib)
--    set_target_properties(example64 PROPERTIES COMPILE_FLAGS "-D_FILE_OFFSET_BITS=64")
--    add_test(example64 example64)
--
--    add_executable(minigzip64 test/minigzip.c)
--    target_link_libraries(minigzip64 zlib)
--    set_target_properties(minigzip64 PROPERTIES COMPILE_FLAGS "-D_FILE_OFFSET_BITS=64")
+
 +if(BUILD_TESTING)
 +	add_executable(example test/example.c)
 +	target_link_libraries(example zlib)
