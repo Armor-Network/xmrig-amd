@@ -40,7 +40,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 include (CheckIncludeFile)
 include (cmake/cpu.cmake)
 include (cmake/os.cmake)
-include (cmake/zlib.cmake)
 include (src/base/base.cmake)
 include (src/backend/backend.cmake)
 
