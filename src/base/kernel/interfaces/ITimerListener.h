@@ -16,8 +16,8 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_ISIGNALLISTENER_H
-#define XMRIG_ISIGNALLISTENER_H
+#ifndef XMRIG_ITIMERLISTENER_H
+#define XMRIG_ITIMERLISTENER_H
 
 
 #include "base/tools/Object.h"
@@ -26,22 +26,22 @@
 namespace xmrig {
 
 
-class String;
+class Timer;
 
 
-class ISignalListener
+class ITimerListener
 {
 public:
-    XMRIG_DISABLE_COPY_MOVE(ISignalListener)
+    XMRIG_DISABLE_COPY_MOVE(ITimerListener)
 
-    ISignalListener()           = default;
-    virtual ~ISignalListener()  = default;
+    ITimerListener()            = default;
+    virtual ~ITimerListener()   = default;
 
-    virtual void onSignal(int signum) = 0;
+    virtual void onTimer(const Timer *timer) = 0;
 };
 
 
 } /* namespace xmrig */
 
 
-#endif // XMRIG_ISIGNALLISTENER_H
+#endif // XMRIG_ITIMERLISTENER_H

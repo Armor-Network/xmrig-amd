@@ -16,8 +16,8 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_ISIGNALLISTENER_H
-#define XMRIG_ISIGNALLISTENER_H
+#ifndef XMRIG_ICONSOLELISTENER_H
+#define XMRIG_ICONSOLELISTENER_H
 
 
 #include "base/tools/Object.h"
@@ -26,22 +26,19 @@
 namespace xmrig {
 
 
-class String;
-
-
-class ISignalListener
+class IConsoleListener
 {
 public:
-    XMRIG_DISABLE_COPY_MOVE(ISignalListener)
+    XMRIG_DISABLE_COPY_MOVE(IConsoleListener)
 
-    ISignalListener()           = default;
-    virtual ~ISignalListener()  = default;
+    IConsoleListener()          = default;
+    virtual ~IConsoleListener() = default;
 
-    virtual void onSignal(int signum) = 0;
+    virtual void onConsoleCommand(char command) = 0;
 };
 
 
 } /* namespace xmrig */
 
 
-#endif // XMRIG_ISIGNALLISTENER_H
+#endif // XMRIG_ICONSOLELISTENER_H

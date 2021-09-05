@@ -16,32 +16,33 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_ISIGNALLISTENER_H
-#define XMRIG_ISIGNALLISTENER_H
+#ifndef XMRIG_ILOGBACKEND_H
+#define XMRIG_ILOGBACKEND_H
 
 
 #include "base/tools/Object.h"
 
 
+#include <cstdarg>
+#include <cstddef>
+
+
 namespace xmrig {
 
 
-class String;
-
-
-class ISignalListener
+class ILogBackend
 {
 public:
-    XMRIG_DISABLE_COPY_MOVE(ISignalListener)
+    XMRIG_DISABLE_COPY_MOVE(ILogBackend)
 
-    ISignalListener()           = default;
-    virtual ~ISignalListener()  = default;
+    ILogBackend()           = default;
+    virtual ~ILogBackend()  = default;
 
-    virtual void onSignal(int signum) = 0;
+    virtual void print(uint64_t timestamp, int level, const char *line, size_t offset, size_t size, bool colors) = 0;
 };
 
 
 } /* namespace xmrig */
 
 
-#endif // XMRIG_ISIGNALLISTENER_H
+#endif // XMRIG_ILOGBACKEND_H

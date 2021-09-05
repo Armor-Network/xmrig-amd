@@ -16,8 +16,8 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_ISIGNALLISTENER_H
-#define XMRIG_ISIGNALLISTENER_H
+#ifndef XMRIG_IHTTPLISTENER_H
+#define XMRIG_IHTTPLISTENER_H
 
 
 #include "base/tools/Object.h"
@@ -26,22 +26,23 @@
 namespace xmrig {
 
 
-class String;
+class HttpData;
+class HttpResponse;
 
 
-class ISignalListener
+class IHttpListener
 {
 public:
-    XMRIG_DISABLE_COPY_MOVE(ISignalListener)
+    XMRIG_DISABLE_COPY_MOVE(IHttpListener)
 
-    ISignalListener()           = default;
-    virtual ~ISignalListener()  = default;
+    IHttpListener()             = default;
+    virtual ~IHttpListener()    = default;
 
-    virtual void onSignal(int signum) = 0;
+    virtual void onHttpData(const HttpData &data) = 0;
 };
 
 
 } /* namespace xmrig */
 
 
-#endif // XMRIG_ISIGNALLISTENER_H
+#endif // XMRIG_IHTTPLISTENER_H

@@ -1,6 +1,6 @@
 /* XMRig
- * Copyright (c) 2018-2020 SChernykh   <https://github.com/SChernykh>
- * Copyright (c) 2016-2020 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright 2018-2020 SChernykh   <https://github.com/SChernykh>
+ * Copyright 2016-2020 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_ISIGNALLISTENER_H
-#define XMRIG_ISIGNALLISTENER_H
+#ifndef XMRIG_IASYNCLISTENER_H
+#define XMRIG_IASYNCLISTENER_H
 
 
 #include "base/tools/Object.h"
@@ -26,22 +26,22 @@
 namespace xmrig {
 
 
-class String;
+class Async;
 
 
-class ISignalListener
+class IAsyncListener
 {
 public:
-    XMRIG_DISABLE_COPY_MOVE(ISignalListener)
+    XMRIG_DISABLE_COPY_MOVE(IAsyncListener)
 
-    ISignalListener()           = default;
-    virtual ~ISignalListener()  = default;
+    IAsyncListener()            = default;
+    virtual ~IAsyncListener()   = default;
 
-    virtual void onSignal(int signum) = 0;
+    virtual void onAsync()      = 0;
 };
 
 
 } /* namespace xmrig */
 
 
-#endif // XMRIG_ISIGNALLISTENER_H
+#endif // XMRIG_IASYNCLISTENER_H
